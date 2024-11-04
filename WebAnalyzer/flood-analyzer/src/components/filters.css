@@ -1,0 +1,61 @@
+.mainForm {
+    background-color: #eee;    
+    border-top: 2px solid lightgray;
+    border-left: 2px solid lightgray;
+    border-right: 2px solid lightgray;
+    width: 100%;
+}
+
+.collapsibleContainerText {
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    background-color: #ccc;
+    padding: 0px 0px 2px 0px;
+}
+
+.collapsibleContainerText span {
+    padding-left: 5px;
+}
+
+.groupLabel {
+    padding-left: 2px;
+    font-weight: 600;
+    font-size: 1.05rem;
+
+}
+
+.fieldTable {
+    display: grid;
+    grid-template-columns: 1fr 4fr 1fr 4fr 1fr 4fr;
+    padding: 5px 0px 10px 20px;
+    row-gap: 8px;
+}
+
+.fieldLabel {
+    padding-right: 10px;
+}
+
+.fieldLabel input {
+    width: 100%;
+}
+
+.fieldInput {
+    
+    display: flex;
+    padding-right: 10px
+}
+
+.fieldInput input {
+    flex: 1;    
+}
+
+.groupingFieldsContainer {
+    display: flex;
+    gap: 20px;
+    padding: 5px 0px 5px 15px;
+}
+
+.groupingField {
+    cursor: pointer;
+}

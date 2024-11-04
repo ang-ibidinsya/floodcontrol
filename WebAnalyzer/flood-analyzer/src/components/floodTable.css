@@ -1,0 +1,86 @@
+.tableContainer {
+    width: 100%;
+}
+
+.floodTable {
+    width: 100%;
+    border: 1px solid lightgrey;
+    border-collapse: collapse;
+}
+
+.thTable, .tdTable {
+    box-shadow: inset 0 0 0 1px lightgrey;
+    padding: 5px 10px 5px 10px;
+}
+
+.thTable {
+    background-color: beige;
+}
+
+.thTable .sortable{
+    cursor: pointer;
+}
+
+.thSortable {
+    cursor: pointer;
+}
+
+.tdCost {
+    text-align: end;
+    font-family: "Courier Prime";
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+.itemDesc {
+    font-size: 0.95rem;
+}
+
+.table-icon {
+    display: inline;
+    margin-left: 5px;
+}
+
+.table-icon-disabled {
+    color: #aaa;
+}
+
+.table-icon-enabled {
+    color: rgb(31, 140, 243);
+}
+
+/* Pagination*/
+.paginator {    
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    background-color: aliceblue;
+    border-top: 2px solid lightgrey;
+    border-left: 2px solid lightgrey;
+    border-right: 2px solid lightgrey;
+    font-weight: 600;
+}
+
+.pageNavBtns {
+    display: flex;
+    gap: 10px;    
+}
+
+.navBtn {
+    margin: auto;
+    font-size: 1.2rem;
+    font-weight: 800;
+    background-color: #ccc;
+    padding: 3px 5px 3px 5px;
+    border-radius: 3px;
+}
+
+.btnEnabled {
+    cursor: pointer;
+}
+
+.btnDisabled {
+    cursor: default;
+    color: gray;
+    pointer-events: none;
+}
