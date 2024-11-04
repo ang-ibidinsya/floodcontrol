@@ -118,7 +118,7 @@ void ParseAll()
         int numPages = document.NumberOfPages;
         //int numPages = 2;
         for (int iPage = 1; iPage <= numPages; iPage++)
-        //for (int iPage = 196; iPage <= 196; iPage++)
+        //for (int iPage = 14; iPage <= 14; iPage++)
         {
             Console.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss")}] Parse Page {iPage}");
             PageContent pageContent = new PageContent();
@@ -322,7 +322,7 @@ void SpecialHandle_DistrictItem(TextBlock block, PageContent pageContent)
     int idx = 0;
     pageContent.IsSpecialHandling = true;
     string[] toks = block.Text.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-    string currItem = string.Empty;
+    ItemBlock currItem = null;
     foreach(string tok in toks)
     {
         if (COL_HEADERS.Contains(tok))
@@ -341,18 +341,18 @@ void SpecialHandle_DistrictItem(TextBlock block, PageContent pageContent)
 
         if (startsWithNum(tok))
         {
-            currItem = tok;
-
-            if (!string.IsNullOrEmpty(currItem))
+            currItem = new ItemBlock()
             {
-                pageContent.ItemBlocks.Add(new ItemBlock()
-                {
-                    Item = currItem,
-                    SpecialPageIdx = idx++,
-                });
-            }
+                Item = tok,
+                SpecialPageIdx = idx++,
+            };
+            pageContent.ItemBlocks.Add(currItem);
+            continue;
         }
-        currItem += " " + tok;
+        if (currItem != null)
+        {
+            currItem.Item += " " + tok;
+        }        
     }
 }
 
