@@ -27,6 +27,8 @@ jobs:
 
       - name: Install dependencies        
         uses: bahmutov/npm-install@v1
+        with:
+          working-directory: /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer
 
       - name: Build project        
         run: npm run build
