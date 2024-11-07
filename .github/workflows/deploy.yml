@@ -23,12 +23,15 @@ jobs:
         run: cd /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer
 
       - name: Install dependencies
+        working-directory: /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer
         uses: bahmutov/npm-install@v1
 
       - name: Build project
+        working-directory: /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer
         run: npm run build
 
       - name: Upload production-ready build files
+        working-directory: /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer
         uses: actions/upload-artifact@v3
         with:
           name: production-files
