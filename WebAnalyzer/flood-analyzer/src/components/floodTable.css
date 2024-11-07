@@ -84,3 +84,30 @@
     color: gray;
     pointer-events: none;
 }
+
+.grandTotalContainer {
+    border-left: 2px solid lightgrey;
+    border-right: 2px solid lightgrey;
+    border-top: 2px solid lightgrey;
+    display: flex;
+    justify-content: flex-end;    
+    background: aliceblue;
+    gap: 10px;
+    padding: 3px 10px 3px 10px;
+    align-items: center;
+}
+
+.grandTotalLabel {
+    font-family: 'Courier Prime', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.grandTotalValue {
+    font-size: 1.45rem;
+    font-weight: 700;
+    font-family: 'Courier Prime', monospace;
+    background: #d2bafa;
+    border-radius: 5px;
+    padding: 3px 10px 1px 10px;
+}

@@ -22,29 +22,50 @@ Chart:
 	   Sorted by:
  *************************************************************************/
 import './filters.css';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useEffect } from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {setFilter} from '../state/filter/filterSlice';
+import Select from 'react-select';
+import {uniqueYears, uniqueRegions, uniqueDistricts} from './filterItems';
+
+// Needed by React Select
+const formatComboOptions = (uniqValues) => {
+    return uniqValues.map((v, i, arr) => {
+        return {value: v, label: v}
+    });
+}
+
+const comboOptions = {
+    Year: formatComboOptions(uniqueYears),
+    Region: formatComboOptions(uniqueRegions),
+    District: formatComboOptions(uniqueDistricts),
+}
 
 export const Filters = () => {    
 
     // Note: calling watch here (not inside useEffect) will cause this for to re-render each time a watched value changes (not good)
     console.log('[Filter render]');
-    const {register, handleSubmit, watch} = useForm();
+    const {register, handleSubmit, watch, control} = useForm();
     
     // redux values
     
     const dispatch = useDispatch();
 
     // Purpose: for firing 
-    useEffect(() => {        
+    useEffect(() => {
         console.log('useEffect')
         const subscription = watch( data => {
             // Will be called on each input change of any of the controls
             // At least, no re-render happens
             console.log('[watch subscription]', data);
-            dispatch(setFilter(data));
+            const actionPayload = {
+                Project: data.Project,
+                Year: data.Year ? data.Year.map(x => x.value): [],
+                Region: data.Region ? data.Region.map(x => x.value): [],
+                District: data.District ? data.District.map(x => x.value): [],
+            }
+            dispatch(setFilter(actionPayload));
         });
 
         return () => {
@@ -59,12 +80,51 @@ export const Filters = () => {
     }
 
     const createFilterField = (fieldName, fieldType) => {
+        const customStylesSelect = {
+            container: provided => ({
+              ...provided,
+              width: '100%',
+            }),
+            control: base => ({
+                ...base,
+                border: '1px solid black',
+                boxShadow: '1px solid black',
+                "&:hover": {
+                    border: "1px solid #054bfc",
+                    cursor: 'text'
+                },                
+            }),
+            multiValue: (styles, { data }) => {                
+                return {
+                  ...styles,
+                  backgroundColor: '#c9e2f5',
+                };
+            }
+        };
+
+        const inputElem = fieldType === 'text' ? 
+            <input {...register(fieldName)} type="text" className="fieldText"></input> :
+            <Controller
+                name={fieldName}
+                control={control}
+                defaultValue=""
+                render = {({ field}) => (
+                    <Select {...field} 
+                        className="fieldSelect"
+                        options={comboOptions[fieldName]}
+                        styles={customStylesSelect}
+                        isMulti={true}
+                        closeMenuOnSelect={false}
+                        placeholder={`Select ${fieldName}...`}
+                    />
+                )}
+            />
         return <>
             <div className="fieldLabel">
                 {fieldName}:
             </div>
-            <div className="fieldInput">
-                <input {...register(fieldName)} type="text"></input>
+            <div className="fieldInput">                
+                {inputElem}
             </div>
         </>
     }
@@ -100,12 +160,10 @@ export const Filters = () => {
                 <i className="bx bxs-filter-alt"></i> Filters
             </div>
             <div className="fieldTable">
-                {createFilterField('Year', 'text')}
-                {createFilterField('Region', 'text')}
-                {createFilterField('District', 'text')}
+                {createFilterField('Year', 'combo')}
+                {createFilterField('Region', 'combo')}
+                {createFilterField('District', 'combo')}
                 {createFilterField('Project', 'text')}
-                {createFilterField('Cost', 'text')}
-                {createFilterField('Politician', 'text')}
             </div>
         </div>
         <div className="groupForm">

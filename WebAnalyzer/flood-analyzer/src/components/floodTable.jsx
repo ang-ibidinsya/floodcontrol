@@ -16,6 +16,7 @@ const columnDefs = [
         {
           accessorKey: "Year",
           header: "Year",
+          filterFn: 'multiValueFilter',
           cell: ({ getValue, row, column, table }) => {
             return <div>{getValue()}</div>
           },
@@ -23,6 +24,7 @@ const columnDefs = [
         {
             accessorKey: "Region",
             header: "Region",
+            filterFn: 'multiValueFilter',
             cell: ({ getValue, row, column, table }) => {
                 return <div>{getValue()}</div>
             },
@@ -30,6 +32,7 @@ const columnDefs = [
           {
             accessorKey: "District",
             header: "District",
+            filterFn: 'multiValueFilter',
             cell: ({ getValue, row, column, table }) => {
                 return <div>{getValue()}</div>
             },
@@ -64,6 +67,18 @@ const convertStateToFilter= (filterState) => {
     if (filterState.Project) {
         ret.push({id: 'Item', value: filterState.Project});
     }
+    //debugger
+    if (filterState.Year?.length > 0) {
+        ret.push({id: 'Year', value: filterState.Year});
+    }
+
+    if (filterState.Region?.length > 0) {
+        ret.push({id: 'Region', value: filterState.Region});
+    }
+
+    if (filterState.District?.length > 0) {
+        ret.push({id: 'District', value: filterState.District});
+    }
 
     return ret;
 }
@@ -96,15 +111,24 @@ export const FloodTable = () => {
         state: {
             columnFilters
         },
-        onColumnFiltersChange: setColumnFilters
+        onColumnFiltersChange: setColumnFilters,
+        filterFns: {
+            multiValueFilter: (row, columnId, filterValue) => {
+                //debugger
+                let ret = filterValue.includes(row.getValue(columnId));
+                //console.log('[multiValueFilter]', ret)
+                return ret;
+            }
+        }
     })
     
-    console.log('[FloodTable] render, filterState:', filterState.Project);
+    console.log('[FloodTable] render, filterState:', filterState);
 
     useEffect(() => {
         console.log('[Table UseEffect]');
-        table.setColumnFilters(tableFilter)
-    }, [filterState.Project])
+        //table.setColumnFilters(tableFilter)
+        table.setColumnFilters(convertStateToFilter(filterState))
+    }, [filterState.Project, filterState.Year, filterState.District, filterState.Region])
 
 
     const getSortingIcon = (isSorted) => {        
@@ -160,11 +184,11 @@ export const FloodTable = () => {
     }
 
     const preparePagninator = () => {
+        let totalFiltered = table.getFilteredRowModel().rows.length;
         let currPageIndex = table.getState().pagination.pageIndex;
-        let firstRecordIndex = currPageIndex * table.getState().pagination.pageSize + 1;
+        let firstRecordIndex = totalFiltered == 0 ? 0 : currPageIndex * table.getState().pagination.pageSize + 1;
         let lastRecordIndex = (currPageIndex + 1) * table.getState().pagination.pageSize;        
         let isInFirstPage = currPageIndex === 0;
-        let totalFiltered = table.getFilteredRowModel().rows.length;
         if (lastRecordIndex > totalFiltered) {
             lastRecordIndex = totalFiltered;
         }
@@ -196,8 +220,22 @@ export const FloodTable = () => {
                 </div>
             </div>
     }
+
+    const showGrandTotal = () => {
+        let rows = table.getFilteredRowModel().rows;
+        let sum = 0;
+        rows.forEach(row => {
+            sum += row.getValue('Cost')
+        })
+        
+        return <div className="grandTotalContainer">
+            <div className="grandTotalLabel">SUBTOTAL:</div>
+            <div className="grandTotalValue">{formatMoney(sum)}</div>
+        </div>;
+    }
     
     return <div className="tableContainer">
+        {showGrandTotal()}
         {preparePagninator()}
         <table className="floodTable">
             <thead>
