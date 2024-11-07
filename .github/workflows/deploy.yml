@@ -20,7 +20,7 @@ jobs:
           node-version: 16
 
       - name: Debug folders
-        run: ls /home/runner/work/floodcontrol/floodcontrol/
+        run: cd /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer
 
       - name: Install dependencies
         uses: bahmutov/npm-install@v1
