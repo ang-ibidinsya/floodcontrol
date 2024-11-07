@@ -9,6 +9,9 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        
 
     steps:
       - name: Checkout repo
@@ -21,17 +24,17 @@ jobs:
 
       - name: Debug folders
         run: cd /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer
+        
+      - name: Debug folders2
+        run: ls    
 
-      - name: Install dependencies
-        working-directory: /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer
+      - name: Install dependencies        
         uses: bahmutov/npm-install@v1
 
-      - name: Build project
-        working-directory: /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer
+      - name: Build project        
         run: npm run build
 
       - name: Upload production-ready build files
-        working-directory: /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer
         uses: actions/upload-artifact@v3
         with:
           name: production-files
