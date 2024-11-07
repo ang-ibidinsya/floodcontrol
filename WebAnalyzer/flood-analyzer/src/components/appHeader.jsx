@@ -1,4 +1,4 @@
-import "./appheader.css";
+import "./appHeader.css";
 
 export const AppHeader = () => {
     return <div className="appHeader">
