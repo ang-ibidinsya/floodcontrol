@@ -19,6 +19,8 @@ https://ang-ibidinsya.github.io/floodcontrol/
 - [ ] Group By District
 - [ ] Drilldown of data after grouping
 - [ ] Bar charts
+- [ ] Politicians vs DEO Mapping
+- [ ] Contractor Data (if available)
 
 **Minor TODO's:**
 - [ ] Selectable Page Size
