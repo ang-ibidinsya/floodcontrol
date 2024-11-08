@@ -14,6 +14,12 @@ https://ang-ibidinsya.github.io/floodcontrol/
 - [x] Display of flood control projects in a flat list
 - [x] Filter by Project Name
 - [x] Filter by Year, Region, District
-- [ ] Group By Year, Region, District
+- [ ] Group By Year
+- [ ] Group By Region
+- [ ] Group By District
 - [ ] Drilldown of data after grouping
 - [ ] Bar charts
+
+**Minor TODO's:**
+- [ ] Selectable Page Size
+- [ ] District filter must cascade from Region filter
