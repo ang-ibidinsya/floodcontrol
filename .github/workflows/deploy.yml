@@ -58,3 +58,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer/dist
+          
+      - name: After Deploy check dir
+        run: ls /home/runner/work/floodcontrol/floodcontrol/WebAnalyzer/flood-analyzer/dist
