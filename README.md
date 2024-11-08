@@ -25,3 +25,6 @@ https://ang-ibidinsya.github.io/floodcontrol/
 **Minor TODO's:**
 - [ ] Selectable Page Size
 - [ ] District filter must cascade from Region filter
+
+**Limitations:**
+- Mobile View wont' be supported. Minimum size: tablet in landscape view.
