@@ -3,7 +3,7 @@ import "./appHeader.css";
 export const AppHeader = () => {
     return <div className="appHeader">
         <div className="titleLine topLine">
-            <img src="/flood-svgrepo-com.svg"  className="appIcon"/>
+            <img src="./flood-svgrepo-com.svg"  className="appIcon"/>
             <span className="mainTitle">List of 5,521 Completed Flood Control Projects</span>
             <span className="subtitle">Completed from July 2022 to May 2024</span>
             <span className="subtitle">|</span>
