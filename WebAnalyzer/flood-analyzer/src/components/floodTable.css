@@ -111,3 +111,10 @@
     border-radius: 5px;
     padding: 3px 10px 1px 10px;
 }
+
+.pageSizeSelector {
+    font-family: inherit;
+    font-weight: 600;
+    padding: 2px;
+    border-radius: 5px;
+}

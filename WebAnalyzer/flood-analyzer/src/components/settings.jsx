@@ -21,11 +21,11 @@ Chart:
 	X: Group
 	   Sorted by:
  *************************************************************************/
-import './filters.css';
+import './settings.css';
 import { useForm, Controller } from 'react-hook-form';
 import { useEffect } from 'react';
-import {useSelector, useDispatch} from 'react-redux';
-import {setFilter} from '../state/filter/filterSlice';
+import { useDispatch} from 'react-redux';
+import {setSettings} from '../state/settings/settingsSlice';
 import Select from 'react-select';
 import {uniqueYears, uniqueRegions, uniqueDistricts} from './filterItems';
 
@@ -42,17 +42,17 @@ const comboOptions = {
     District: formatComboOptions(uniqueDistricts),
 }
 
-export const Filters = () => {    
+export const Settings = () => {    
 
     // Note: calling watch here (not inside useEffect) will cause this for to re-render each time a watched value changes (not good)
-    console.log('[Filter render]');
+    console.log('[Settings render]');
     const {register, handleSubmit, watch, control} = useForm();
     
     // redux values
     
     const dispatch = useDispatch();
 
-    // Purpose: for firing 
+    // Purpose: for firing redux action
     useEffect(() => {
         console.log('useEffect')
         const subscription = watch( data => {
@@ -60,12 +60,17 @@ export const Filters = () => {
             // At least, no re-render happens
             console.log('[watch subscription]', data);
             const actionPayload = {
-                Project: data.Project,
-                Year: data.Year ? data.Year.map(x => x.value): [],
-                Region: data.Region ? data.Region.map(x => x.value): [],
-                District: data.District ? data.District.map(x => x.value): [],
+                // Filters
+                Filters: {
+                    Project: data.Project,
+                    Year: data.Year ? data.Year.map(x => x.value): [],
+                    Region: data.Region ? data.Region.map(x => x.value): [],
+                    District: data.District ? data.District.map(x => x.value): [],
+                },
+                // Grouping
+                Grouping: data.Grouping
             }
-            dispatch(setFilter(actionPayload));
+            dispatch(setSettings(actionPayload));
         });
 
         return () => {
@@ -132,19 +137,31 @@ export const Filters = () => {
     const createGroupingFields = () => {
         return <div className="groupingFieldsContainer">
             <label className="groupingField">
-                <input type="radio" name="groupingFields" value="Year"></input>
+                <input type="radio" name="groupingFields" value="Year"
+                    {...register("Grouping", { required: true })}
+                >
+                </input>
                 <span>Year</span>
             </label>
             <label className="groupingField">
-                <input type="radio" name="groupingFields" value="Region"></input>
+                <input type="radio" name="groupingFields" value="Region"
+                    {...register("Grouping", { required: true })}
+                >
+                </input>
                 <span>Region</span>
             </label>
             <label className="groupingField">
-                <input type="radio" name="groupingFields" value="District"></input>
+                <input type="radio" name="groupingFields" value="District"
+                    {...register("Grouping", { required: true })}
+                >                    
+                </input>
                 <span>District</span>
             </label>
             <label className="groupingField">
-                <input type="radio" name="groupingFields" value="Project"></input>
+                <input type="radio" name="groupingFields" value="Project" defaultChecked 
+                    {...register("Grouping", { required: true })}
+                >                    
+                </input>
                 <span>Project</span>
             </label>
         </div>;
@@ -155,6 +172,7 @@ export const Filters = () => {
             <i className="bx bxs-cog"></i>
             <span>Settings</span>
         </div>
+        {/* Filter */}
         <div className="groupForm">
             <div className="groupLabel">
                 <i className="bx bxs-filter-alt"></i> Filters
@@ -166,12 +184,14 @@ export const Filters = () => {
                 {createFilterField('Project', 'text')}
             </div>
         </div>
-        <div className="groupForm">
+       {/* Gouping */}
+       <div className="groupForm">
             <div className="groupLabel">
-                <i className="bx bx-merge"></i> Grouping
+                <i className="bx bx-merge"></i> View By / Grouping
             </div>
             {createGroupingFields()}
         </div>
+        
     </form>
     return formMain;
 }

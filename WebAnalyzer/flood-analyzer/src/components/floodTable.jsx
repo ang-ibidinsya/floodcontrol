@@ -11,76 +11,145 @@ import {
   } from "@tanstack/react-table";
 import {formatMoney} from '../utils/utils';
 import {useSelector} from 'react-redux';
-
-const columnDefs = [
-        {
-          accessorKey: "Year",
-          header: "Year",
-          filterFn: 'multiValueFilter',
-          cell: ({ getValue, row, column, table }) => {
-            return <div>{getValue()}</div>
-          },
-        },
-        {
-            accessorKey: "Region",
-            header: "Region",
-            filterFn: 'multiValueFilter',
-            cell: ({ getValue, row, column, table }) => {
-                return <div>{getValue()}</div>
-            },
-          },
-          {
-            accessorKey: "District",
-            header: "District",
-            filterFn: 'multiValueFilter',
-            cell: ({ getValue, row, column, table }) => {
-                return <div>{getValue()}</div>
-            },
-          },
-          {
-            accessorKey: "Item",
-            header: "Project",
-            enableSorting: false, // disables sorting - from tanstack
-
-            cell: ({ getValue, row, column, table }) => {
-                return <div className="itemDesc">{getValue()}</div>
-            },
-          },
-          {
-            accessorKey: "Cost",
-            header: "Cost",
-            sortingFn: 'alphanumeric',
-            cell: ({ getValue, row, column, table }) => {
-                return <div className="tdCost">{formatMoney(getValue())}</div>
-            },
-          },
-        
-      ];
+import {FloodTableByProject} from './floodTable.project';
+import {FloodTableByYear} from './floodTable.year';
+import {FloodTableByRegion} from './floodTable.region';
+import {FloodTableByDistrict} from './floodTable.district';
 
 const iconSortLookup = {
     'asc': 'bx bxs-chevron-up-circle',
     'desc': 'bx bxs-chevron-down-circle',
 }
 
-const convertStateToFilter= (filterState) => {
+// Returns Table filter required by react-table
+export const convertStateToTableFilter= (settingsState) => {
     let ret = [];
-    if (filterState.Project) {
-        ret.push({id: 'Item', value: filterState.Project});
+    if (settingsState.Filters.Project) {
+        ret.push({id: 'Item', value: settingsState.Filters.Project});
     }
-    //debugger
-    if (filterState.Year?.length > 0) {
-        ret.push({id: 'Year', value: filterState.Year});
-    }
-
-    if (filterState.Region?.length > 0) {
-        ret.push({id: 'Region', value: filterState.Region});
+    
+    if (settingsState.Filters.Year?.length > 0) {
+        ret.push({id: 'Year', value: settingsState.Filters.Year});
     }
 
-    if (filterState.District?.length > 0) {
-        ret.push({id: 'District', value: filterState.District});
+    if (settingsState.Filters.Region?.length > 0) {
+        ret.push({id: 'Region', value: settingsState.Filters.Region});
+    }
+
+    if (settingsState.Filters.District?.length > 0) {
+        ret.push({id: 'District', value: settingsState.Filters.District});
     }
 
     return ret;
+}
+
+export const prepareBody = (table) => {
+    const rows = table.getRowModel().rows;
+    const ret = rows.map(row => {
+        return <tr key={row.id}>
+            {row.getVisibleCells().map(cell => {
+                return <td key={cell.id} className="tdTable">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+            })}
+        </tr>
+    })
+    //console.log('rows', ret)
+    return ret;
+}
+
+const getSortingIcon = (isSorted) => {        
+    const iconLookup = iconSortLookup[isSorted];
+    if (!iconLookup) {
+        return <i className="bx bxs-sort-alt table-icon table-icon-disabled"></i>
+    }
+    const iconClass = `${iconLookup} table-icon table-icon-enabled`;
+
+    return <i className={iconClass}></i>;
+}
+
+export const prepareHeader = (table) => {
+    const headerGroups = table.getHeaderGroups();
+        
+    //console.log('HeaderGroups', headerGroups);
+
+    let headerColumns = headerGroups.map(hdrGrp => {
+        return hdrGrp.headers.map(header => {
+            const isSortable = header.column.getCanSort();
+            let thClassNames = 'thTable';
+            if (isSortable) {
+                thClassNames += ' thSortable'
+            }
+            return <th key={header.id} className={thClassNames} onClick={header.column.getToggleSortingHandler()}>
+                {header.column.columnDef.header}
+                {isSortable && getSortingIcon(header.column.getIsSorted())}
+                
+            </th>
+        })
+    });
+    return <tr>
+        {headerColumns}
+    </tr>;
+}
+
+export const showGrandTotal = (table, costColumn) => {
+    let rows = table.getFilteredRowModel().rows;
+    let sum = 0;
+    // Use for instead of foreach, for potential performance improvements
+    for (let i = 0; i < rows.length; i++) {
+        sum += rows[i].getValue(costColumn)
+    }
+    return <div className="grandTotalContainer">
+        <div className="grandTotalLabel">SUBTOTAL:</div>
+        <div className="grandTotalValue">{formatMoney(sum)}</div>
+    </div>;
+}
+
+export const preparePagninator = (table) => {
+    let totalFiltered = table.getFilteredRowModel().rows.length;
+    let currPageIndex = table.getState().pagination.pageIndex;
+    let firstRecordIndex = totalFiltered == 0 ? 0 : currPageIndex * table.getState().pagination.pageSize + 1;
+    let lastRecordIndex = (currPageIndex + 1) * table.getState().pagination.pageSize;        
+    let isInFirstPage = currPageIndex === 0;
+    if (lastRecordIndex > totalFiltered) {
+        lastRecordIndex = totalFiltered;
+    }
+    let isInLastPage = lastRecordIndex >= totalFiltered;
+    return <div className="paginator">
+            <div className='currPage'>Showing {firstRecordIndex} - {lastRecordIndex} of {totalFiltered} </div>
+            <select
+                className='pageSizeSelector'
+                value={table.getState().pagination.pageSize}
+                onChange={e => {
+                    table.setPageSize(Number(e.target.value))
+                }}
+                >
+                {[10, 20, 50, 100, 250].map(pageSize => (
+                    <option key={pageSize} value={pageSize}>
+                    Show {pageSize}
+                    </option>
+                ))}
+            </select>
+            <div className='pageNavBtns'>
+                <i className={`navBtn bx bx-first-page ${isInFirstPage ? 'btnDisabled': 'btnEnabled' }`} 
+                    onClick={()=>table.firstPage()}
+                    title="Go to First Page"></i>
+
+                <i className={`navBtn bx bx-chevron-left ${isInFirstPage ? 'btnDisabled': 'btnEnabled' }`} 
+                    onClick={()=>table.previousPage()}
+                    title="Go to Previous Page"></i>
+                
+                {/* TODO dropdown to page number*/}
+
+                <i className={`navBtn bx bx-chevron-right ${isInLastPage ? 'btnDisabled': 'btnEnabled' }`} 
+                    onClick={()=>table.nextPage()}
+                    title="Go to Next Page"></i>
+
+                <i className={`navBtn bx bx-last-page ${isInLastPage ? 'btnDisabled': 'btnEnabled' }`} 
+                    onClick={()=>table.lastPage()}
+                    title="Go to Last Page"></i>
+            </div>
+        </div>
 }
 
 /* Filter re-render issue: Each time filter changes, there will be 3 re-renders (expected: 2)
@@ -91,161 +160,34 @@ const convertStateToFilter= (filterState) => {
 
 export const FloodTable = () => {
     // Redux values (global-values)
-    const filterState = useSelector(state => state.filterReducer);
+    const settingsState = useSelector(state => state.settingsReducer);
     
+    const [columnFilters, setColumnFilters] = useState([]);
+    //console.log('[FloodTable] render, settingsState:', settingsState, 'New Table Filter', tableFilter);
     
-    // Table filter (local table filters)
-    const tableFilter = convertStateToFilter(filterState);
-    const [columnFilters, setColumnFilters] = useState([]);    
-    //console.log('[FloodTable] render, filterState:', filterState, 'New Table Filter', tableFilter);    
-
-    // Columns
-    //const columns = useMemo(() => prepareColumns(), );
-    const table = useReactTable({
-        data,
-        columns: columnDefs,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        state: {
-            columnFilters
-        },
-        onColumnFiltersChange: setColumnFilters,
-        filterFns: {
-            multiValueFilter: (row, columnId, filterValue) => {
-                //debugger
-                let ret = filterValue.includes(row.getValue(columnId));
-                //console.log('[multiValueFilter]', ret)
-                return ret;
-            }
-        }
-    })
-    
-    console.log('[FloodTable] render, filterState:', filterState);
-
-    useEffect(() => {
-        console.log('[Table UseEffect]');
-        //table.setColumnFilters(tableFilter)
-        table.setColumnFilters(convertStateToFilter(filterState))
-    }, [filterState.Project, filterState.Year, filterState.District, filterState.Region])
-
-
-    const getSortingIcon = (isSorted) => {        
-        const iconLookup = iconSortLookup[isSorted];
-        if (!iconLookup) {
-            return <i className="bx bxs-sort-alt table-icon table-icon-disabled"></i>
-        }
-        const iconClass = `${iconLookup} table-icon table-icon-enabled`;
-        //console.log('isSorted', isSorted, iconClass);
-
-        return <i className={iconClass}></i>;
+    // Choose table to return
+    if (!settingsState.Grouping || settingsState.Grouping === 'Project') {
+        return <FloodTableByProject 
+            settingsState={settingsState}
+        />;
     }
 
-    const prepareHeader = () => {
-        const headerGroups = table.getHeaderGroups();
-        
-        //console.log('HeaderGroups', headerGroups);
-
-        let headerColumns = headerGroups.map(hdrGrp => {
-            return hdrGrp.headers.map(header => {
-                const isSortable = header.column.getCanSort();
-                let thClassNames = 'thTable';
-                if (isSortable) {
-                    thClassNames += ' thSortable'
-                }
-                return <th key={header.id} className={thClassNames} onClick={header.column.getToggleSortingHandler()}>
-                    {header.column.columnDef.header}
-                    {isSortable && getSortingIcon(header.column.getIsSorted())}
-                    
-                </th>
-            })
-        });
-        //console.log('headers', headerColumns);
-
-        return <tr>
-            {headerColumns}
-        </tr>;
+    if (settingsState.Grouping === 'Year') {
+        return <FloodTableByYear 
+            settingsState={settingsState}
+        />;
     }
 
-    const prepareBody = () => {
-        const rows = table.getRowModel().rows;
-        const ret = rows.map(row => {
-            return <tr key={row.id}>
-                {row.getVisibleCells().map(cell => {
-                    return <td key={cell.id} className="tdTable">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                })}
-            </tr>
-        })
-        //console.log('rows', ret)
-        return ret;
+    if (settingsState.Grouping === 'Region') {
+        return <FloodTableByRegion 
+            settingsState={settingsState}
+        />;
     }
 
-    const preparePagninator = () => {
-        let totalFiltered = table.getFilteredRowModel().rows.length;
-        let currPageIndex = table.getState().pagination.pageIndex;
-        let firstRecordIndex = totalFiltered == 0 ? 0 : currPageIndex * table.getState().pagination.pageSize + 1;
-        let lastRecordIndex = (currPageIndex + 1) * table.getState().pagination.pageSize;        
-        let isInFirstPage = currPageIndex === 0;
-        if (lastRecordIndex > totalFiltered) {
-            lastRecordIndex = totalFiltered;
-        }
-        let isInLastPage = lastRecordIndex >= totalFiltered;
-        return <div className="paginator">
-                <div className='currPage'>Showing {firstRecordIndex} - {lastRecordIndex} of {totalFiltered} </div>
-                {/* TODO: Let the user choose page size */}
-                <div className='pageSize'>
-                    Page Size: 10 
-                </div>
-                <div className='pageNavBtns'>
-                    <i className={`navBtn bx bx-first-page ${isInFirstPage ? 'btnDisabled': 'btnEnabled' }`} 
-                        onClick={()=>table.firstPage()}
-                        title="Go to First Page"></i>
-
-                    <i className={`navBtn bx bx-chevron-left ${isInFirstPage ? 'btnDisabled': 'btnEnabled' }`} 
-                        onClick={()=>table.previousPage()}
-                        title="Go to Previous Page"></i>
-                    
-                    {/* TODO dropdown to page number*/}
-
-                    <i className={`navBtn bx bx-chevron-right ${isInLastPage ? 'btnDisabled': 'btnEnabled' }`} 
-                        onClick={()=>table.nextPage()}
-                        title="Go to Next Page"></i>
-
-                    <i className={`navBtn bx bx-last-page ${isInLastPage ? 'btnDisabled': 'btnEnabled' }`} 
-                        onClick={()=>table.lastPage()}
-                        title="Go to Last Page"></i>
-                </div>
-            </div>
+    if (settingsState.Grouping === 'District') {
+        return <FloodTableByDistrict 
+            settingsState={settingsState}
+        />;
     }
 
-    const showGrandTotal = () => {
-        let rows = table.getFilteredRowModel().rows;
-        let sum = 0;
-        rows.forEach(row => {
-            sum += row.getValue('Cost')
-        })
-        
-        return <div className="grandTotalContainer">
-            <div className="grandTotalLabel">SUBTOTAL:</div>
-            <div className="grandTotalValue">{formatMoney(sum)}</div>
-        </div>;
-    }
-    
-    return <div className="tableContainer">
-        {showGrandTotal()}
-        {preparePagninator()}
-        <table className="floodTable">
-            <thead>
-                {prepareHeader()}
-            </thead>
-            <tbody>
-                {prepareBody()}
-            </tbody>
-            {/* TODO: Grand total */}
-        </table>
-        
-    </div>;
 }
