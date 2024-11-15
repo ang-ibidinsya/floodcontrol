@@ -7,10 +7,24 @@ The PDF File has 323 pages. Please report if there are errors in the outputted J
 ## 2. WebAnalyzer (🚧Work-in-Progress)
 Web-based project using React that consumes the JSON file outputted by the FloodControlParser, to allow the user to filter/sort/group/drilldown the data.
 
-Roadmap:
+### Demo Site:
+https://ang-ibidinsya.github.io/floodcontrol/
+
+**Roadmap:**
 - [x] Display of flood control projects in a flat list
 - [x] Filter by Project Name
-- [ ] Filter by Year, Region, District
-- [ ] Group By Year, Region, District
+- [x] Filter by Year, Region, District
+- [ ] Group By Year
+- [ ] Group By Region
+- [ ] Group By District
 - [ ] Drilldown of data after grouping
 - [ ] Bar charts
+- [ ] Politicians vs DEO Mapping
+- [ ] Contractor Data (if available)
+
+**Minor TODO's:**
+- [ ] Selectable Page Size
+- [ ] District filter must cascade from Region filter
+
+**Limitations:**
+- Mobile View wont' be supported. Minimum size: tablet in landscape view.
