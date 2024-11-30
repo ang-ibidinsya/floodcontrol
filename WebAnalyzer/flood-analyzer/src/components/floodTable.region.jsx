@@ -49,7 +49,7 @@ export const FloodTableByRegion = (props) => {
             accessorKey: "subtotal",
             header: "Cost",
             cell: ({ getValue, row, column, table }) => {
-                return <div className="tdCost">{formatMoney(getValue())}</div>
+                return <div className="divCost">{formatMoney(getValue())}</div>
             },
         },
     ];

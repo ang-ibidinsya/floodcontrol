@@ -11,6 +11,7 @@ import {
   } from "@tanstack/react-table";
 import {prepareBody, prepareHeader, preparePagninator, showGrandTotal, convertStateToTableFilter} from './floodTable';
 import {formatMoney} from '../utils/utils';
+import {BarChart} from '../controls/barchart';
 
 
 const columnDefs = [
@@ -51,10 +52,20 @@ const columnDefs = [
         accessorKey: "Cost",
         header: "Cost",
         sortingFn: 'alphanumeric',
-        cell: ({ getValue, row, column, table }) => {
-            return <div className="tdCost">{formatMoney(getValue())}</div>
+        cell: ({ getValue, row, column, table }) => {                        
+            let {minCost, maxCost} = table.getState();
+            return <div className="divCost">{formatMoney(getValue())}</div>;
         },
     },
+    {
+        accessorKey: "CostBar",
+        header: "CostBar",
+        cell: ({ getValue, row, column, table }) => {
+            let {minCost, maxCost} = table.getState();
+            return <BarChart cost={row.getValue('Cost')} minCost={minCost} maxCost={maxCost}/>;
+        },
+    },
+
 ];
 
 export const FloodTableByProject = (props) => {
@@ -71,7 +82,9 @@ export const FloodTableByProject = (props) => {
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
         state: {
-            columnFilters: columnFilters
+            columnFilters: columnFilters,
+            maxCost: settingsState.FilteredData.overallProjMaxCost,
+            minCost: settingsState.FilteredData.overallProjMinCost,
         },
         onColumnFiltersChange: setColumnFilters,
         filterFns: {

@@ -9,8 +9,22 @@
 }
 
 .thTable, .tdTable {
-    box-shadow: inset 0 0 0 1px lightgrey;
+    
+    border: 2px solid lightgrey;
     padding: 5px 10px 5px 10px;
+}
+
+.tdCost {
+    border-left: 2px 0px 2px 2px solid lightgrey;
+    border-top: 2px solid lightgrey;
+    border-bottom: 2px solid lightgrey;
+    padding: 5px 10px 5px 10px;
+}
+
+.tdCostBar {
+    border-right: 2px solid lightgrey;
+    border-top: 2px solid lightgrey;
+    border-bottom: 2px solid lightgrey;
 }
 
 .thTable {
@@ -25,7 +39,7 @@
     cursor: pointer;
 }
 
-.tdCost {
+.divCost {
     text-align: end;
     font-family: "Courier Prime";
     font-weight: 600;

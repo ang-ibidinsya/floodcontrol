@@ -34,8 +34,18 @@ const mapAndFilterData = (filters) => {
         yearGroups: {},
         regionGroups: {},
         districtGroups: {},
-        grandTotal: 0
+        grandTotal: 0, // filtered Grandtotal
+        // not affected by filter
+        overallProjMaxCost: 0, 
+        overallProjMinCost: Number.MAX_VALUE, 
+        overallYearMaxCost: 0,
+        overallYearMinCost: Number.MAX_VALUE,
     }
+
+    // Optimization TODO: Do not re-compute unfiltered items each time
+    let unFilteredYearMap = {};
+    let unFilteredRegionMap = {};
+    let unFilteredDistrictMap = {};
     // use for instead of forEach
     for (let i = 0; i < data.length; i++) {
         let currData = data[i];
@@ -43,20 +53,25 @@ const mapAndFilterData = (filters) => {
         let currRegion = currData.Region;
         let currDistrict = currData.District;
 
-        if (!satisfiesFilter(currData, filters)) {
-            continue;
-        }
+        ret.overallProjMaxCost = Math.max(ret.overallProjMaxCost, currData.Cost);
+        ret.overallProjMinCost = Math.min(ret.overallProjMinCost, currData.Cost);
+
+        let bSatisfiesFilter = satisfiesFilter(currData, filters);
         
         // [a] year
         if (!mapYearGroups[currYear]) {
             mapYearGroups[currYear] = {    
                 items:[], 
                 subtotal: 0,
-                year: currYear
+                year: currYear                
             };
         }
-        mapYearGroups[currYear].items.push(currData);
-        mapYearGroups[currYear].subtotal += currData.Cost;
+        if (!unFilteredYearMap[currYear]) {
+            unFilteredYearMap[currYear] = {
+                subtotal: 0
+            }
+        }
+        unFilteredYearMap[currYear].subtotal += currData.Cost;
 
         // [b] region
         if (!mapRegionGroups[currRegion]) {
@@ -66,8 +81,12 @@ const mapAndFilterData = (filters) => {
                 region: currRegion
             };
         }
-        mapRegionGroups[currRegion].items.push(currData);
-        mapRegionGroups[currRegion].subtotal += currData.Cost;
+        if (!unFilteredRegionMap[currRegion]) {
+            unFilteredRegionMap[currRegion] = {
+                subtotal: 0
+            }
+        }
+        unFilteredRegionMap[currRegion].subtotal += currData.Cost;
 
         // [c] district
         if (!mapDistrictGroups[currDistrict]) {
@@ -77,71 +96,31 @@ const mapAndFilterData = (filters) => {
                 district: currDistrict
             };
         }
-        mapDistrictGroups[currDistrict].items.push(currData);
-        mapDistrictGroups[currDistrict].subtotal += currData.Cost;
-        ret.grandTotal += currData.Cost;
+        if (!unFilteredDistrictMap[currDistrict]) {
+            unFilteredDistrictMap[currDistrict] = {
+                subtotal: 0
+            }
+        }
+        unFilteredDistrictMap[currDistrict].subtotal += currData.Cost;
+
+        if (bSatisfiesFilter) {
+            mapYearGroups[currYear].items.push(currData);
+            mapYearGroups[currYear].subtotal += currData.Cost;
+            mapRegionGroups[currRegion].items.push(currData);
+            mapRegionGroups[currRegion].subtotal += currData.Cost;
+            mapDistrictGroups[currDistrict].items.push(currData);
+            mapDistrictGroups[currDistrict].subtotal += currData.Cost;
+            ret.grandTotal += currData.Cost;
+        }
     }
+
+    const unfilteredYearData = Object.values(unFilteredYearMap).map (y => y.subtotal);
+    ret.overallYearMaxCost = Math.max(...unfilteredYearData);
+    ret.overallYearMinCost = Math.min(...unfilteredYearData);
 
     ret.yearGroups = Object.values(mapYearGroups);
     ret.regionGroups = Object.values(mapRegionGroups);
     ret.districtGroups = Object.values(mapDistrictGroups);
-
-    console.log('[mapAndFilterData] ret', ret);
-    return ret;
-}
-
-const mapAndFilterDataOrig = (filters) => {
-    let ret = {
-        yearGroups: {},
-        regionGroups: {},
-        districtGroups: {},
-        grandTotal: 0
-    }
-    // use for instead of forEach
-    for (let i = 0; i < data.length; i++) {
-        let currData = data[i];
-        let currYear = currData.Year;
-        let currRegion = currData.Region;
-        let currDistrict = currData.District;
-
-        if (!satisfiesFilter(currData, filters)) {
-            continue;
-        }
-        
-        // [a] year
-        if (!ret.yearGroups[currYear]) {
-            ret.yearGroups[currYear] = {    
-                items:[], 
-                subtotal: 0,
-                year: currYear
-            };
-        }
-        ret.yearGroups[currYear].items.push(currData);
-        ret.yearGroups[currYear].subtotal += currData.Cost;
-
-        // [b] region
-        if (!ret.regionGroups[currRegion]) {
-            ret.regionGroups[currRegion] = {
-                items:[], 
-                subtotal: 0,
-                year: currYear
-            };
-        }
-        ret.regionGroups[currRegion].items.push(currData);
-        ret.regionGroups[currRegion].subtotal += currData.Cost;
-
-        // [c] district
-        if (!ret.districtGroups[currDistrict]) {
-            ret.districtGroups[currDistrict] = {
-                items:[], 
-                subtotal: 0,
-                year: currYear
-            };
-        }
-        ret.districtGroups[currDistrict].items.push(currData);
-        ret.districtGroups[currDistrict].subtotal += currData.Cost;
-        ret.grandTotal += currData.Cost;
-    }
 
     console.log('[mapAndFilterData] ret', ret);
     return ret;

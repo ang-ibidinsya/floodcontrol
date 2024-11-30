@@ -44,14 +44,30 @@ export const convertStateToTableFilter= (settingsState) => {
 }
 
 export const prepareBody = (table) => {
+
+    const prepareCells = (row) => {
+        let retCells = row.getVisibleCells().map(cell => {
+            const cellColId = cell.column.id;
+            let cellClass = 'tdTable';
+            if (cellColId === 'Cost' || cellColId === 'subtotal') {
+                cellClass = 'tdCost';
+            }
+            else if (cellColId === 'CostBar') {
+                cellClass = 'tdCostBar';
+            }
+            return <td key={cell.id} className={cellClass}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </td>
+        });
+        //retCells.push(<td key="costBar" className="tdCostBar">bar</td>)
+
+        return retCells;
+    }
+
     const rows = table.getRowModel().rows;
     const ret = rows.map(row => {
         return <tr key={row.id}>
-            {row.getVisibleCells().map(cell => {
-                return <td key={cell.id} className="tdTable">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-            })}
+            {prepareCells(row)}
         </tr>
     })
     //console.log('rows', ret)
@@ -70,23 +86,28 @@ const getSortingIcon = (isSorted) => {
 
 export const prepareHeader = (table) => {
     const headerGroups = table.getHeaderGroups();
-        
-    //console.log('HeaderGroups', headerGroups);
-
-    let headerColumns = headerGroups.map(hdrGrp => {
-        return hdrGrp.headers.map(header => {
+    let headerColumns = [];
+    
+    headerGroups.forEach(hdrGrp => {
+        hdrGrp.headers.forEach(header => {
+            let colHeader = header.column.columnDef.header;
+            if (colHeader === 'CostBar') {
+                return;
+            }
             const isSortable = header.column.getCanSort();
             let thClassNames = 'thTable';
             if (isSortable) {
                 thClassNames += ' thSortable'
             }
-            return <th key={header.id} className={thClassNames} onClick={header.column.getToggleSortingHandler()}>
-                {header.column.columnDef.header}
-                {isSortable && getSortingIcon(header.column.getIsSorted())}
-                
-            </th>
-        })
-    });
+            let colSpan = colHeader === 'Cost' ? 2 : 1;
+
+            headerColumns.push(<th key={header.id} className={thClassNames} onClick={header.column.getToggleSortingHandler()} colSpan={colSpan}>
+                {colHeader}
+                {isSortable && getSortingIcon(header.column.getIsSorted())}                
+            </th>);
+        });
+    })
+
     return <tr>
         {headerColumns}
     </tr>;
