@@ -43,7 +43,7 @@ export const convertStateToTableFilter= (settingsState) => {
     return ret;
 }
 
-export const prepareBody = (table) => {
+export const prepareBody = (table, isSummaryType) => {
 
     const prepareCells = (row) => {
         let retCells = row.getVisibleCells().map(cell => {
@@ -54,6 +54,12 @@ export const prepareBody = (table) => {
             }
             else if (cellColId === 'CostBar') {
                 cellClass = 'tdCostBar';
+                if (isSummaryType) {
+                    cellClass += ' tdCostBarFullWidth';
+                }
+            }
+            else if (isSummaryType) {
+                cellClass += ' tdSummary';
             }
             return <td key={cell.id} className={cellClass}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -183,7 +189,6 @@ export const FloodTable = () => {
     // Redux values (global-values)
     const settingsState = useSelector(state => state.settingsReducer);
     
-    const [columnFilters, setColumnFilters] = useState([]);
     //console.log('[FloodTable] render, settingsState:', settingsState, 'New Table Filter', tableFilter);
     
     // Choose table to return

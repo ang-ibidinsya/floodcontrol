@@ -3,6 +3,7 @@
 
 body {
   font-family: 'Roboto Slab';
+  min-width: 760px;
 }
 
 html {

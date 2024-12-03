@@ -40,6 +40,10 @@ const mapAndFilterData = (filters) => {
         overallProjMinCost: Number.MAX_VALUE, 
         overallYearMaxCost: 0,
         overallYearMinCost: Number.MAX_VALUE,
+        overallRegionMaxCost: 0,
+        overallRegionMinCost: Number.MAX_VALUE,
+        overallDistrictMaxCost: 0,
+        overallDistrictMinCost: Number.MAX_VALUE,
     }
 
     // Optimization TODO: Do not re-compute unfiltered items each time
@@ -78,7 +82,8 @@ const mapAndFilterData = (filters) => {
             mapRegionGroups[currRegion] = {
                 items:[], 
                 subtotal: 0,
-                region: currRegion
+                region: currRegion,
+                yearSubTotals: {}
             };
         }
         if (!unFilteredRegionMap[currRegion]) {
@@ -93,7 +98,8 @@ const mapAndFilterData = (filters) => {
             mapDistrictGroups[currDistrict] = {
                 items:[], 
                 subtotal: 0,
-                district: currDistrict
+                district: currDistrict,
+                yearSubTotals: {}
             };
         }
         if (!unFilteredDistrictMap[currDistrict]) {
@@ -106,17 +112,28 @@ const mapAndFilterData = (filters) => {
         if (bSatisfiesFilter) {
             mapYearGroups[currYear].items.push(currData);
             mapYearGroups[currYear].subtotal += currData.Cost;
+
             mapRegionGroups[currRegion].items.push(currData);
             mapRegionGroups[currRegion].subtotal += currData.Cost;
+            mapRegionGroups[currRegion].yearSubTotals[currData.Year] = (mapRegionGroups[currRegion].yearSubTotals[currData.Year] || 0 ) + currData.Cost;
+
             mapDistrictGroups[currDistrict].items.push(currData);
             mapDistrictGroups[currDistrict].subtotal += currData.Cost;
+            mapDistrictGroups[currDistrict].yearSubTotals[currData.Year] = (mapDistrictGroups[currDistrict].yearSubTotals[currData.Year] || 0 ) + currData.Cost;
+
             ret.grandTotal += currData.Cost;
         }
     }
 
     const unfilteredYearData = Object.values(unFilteredYearMap).map (y => y.subtotal);
+    const unfilteredRegionData = Object.values(unFilteredRegionMap).map (y => y.subtotal);
+    const unfilteredDistrictData = Object.values(unFilteredDistrictMap).map (y => y.subtotal);
     ret.overallYearMaxCost = Math.max(...unfilteredYearData);
     ret.overallYearMinCost = Math.min(...unfilteredYearData);
+    ret.overallRegionMaxCost = Math.max(...unfilteredRegionData);
+    ret.overallRegionMinCost = Math.min(...unfilteredRegionData);
+    ret.overallDistrictMaxCost = Math.max(...unfilteredDistrictData);
+    ret.overallDistrictMinCost = Math.min(...unfilteredDistrictData);
 
     ret.yearGroups = Object.values(mapYearGroups);
     ret.regionGroups = Object.values(mapRegionGroups);

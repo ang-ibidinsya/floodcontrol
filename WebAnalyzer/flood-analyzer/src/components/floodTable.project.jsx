@@ -81,6 +81,11 @@ export const FloodTableByProject = (props) => {
         getPaginationRowModel: getPaginationRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        initialState: {
+            pagination: {
+                pageSize: 20,
+            },
+        },
         state: {
             columnFilters: columnFilters,
             maxCost: settingsState.FilteredData.overallProjMaxCost,

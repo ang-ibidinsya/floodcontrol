@@ -10,6 +10,7 @@ import {
   } from "@tanstack/react-table";
 import {prepareBody, prepareHeader, preparePagninator} from './floodTable';
 import {formatMoney} from '../utils/utils';
+import {StackedBarChart} from '../controls/stackedbarchart';
 
 const convertStateToTableFilter = (settingsState) => {
     let ret = [];
@@ -52,6 +53,21 @@ export const FloodTableByDistrict = (props) => {
                 return <div className="divCost">{formatMoney(getValue())}</div>
             },
         },
+        {
+            accessorKey: "CostBar",
+            header: "CostBar",
+            cell: ({ getValue, row, column, table }) => {
+                let {districtGroups, minCost, maxCost} = table.getState();
+                const currDistrict = row.getValue('district');
+                const findDistrict = districtGroups.find(r => r.district === currDistrict);
+                if (!findDistrict) {
+                    console.error('[RegionTavble][CostBar] Unable to find district', currDistrict);
+                    return;
+                }
+                const yearSubtotals = findDistrict.yearSubTotals;                
+                return <StackedBarChart name={currDistrict} subtotalsMap={yearSubtotals} minCost={minCost} maxCost={maxCost}/>;
+            },
+        },
     ];
 
     const table = useReactTable({
@@ -62,8 +78,16 @@ export const FloodTableByDistrict = (props) => {
         getPaginationRowModel: getPaginationRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        initialState: {
+            pagination: {
+                pageSize: 20,
+            },
+        },
         state: {
-            columnFilters: columnFilters
+            columnFilters: columnFilters,
+            districtGroups: settingsState.FilteredData.districtGroups,
+            maxCost: settingsState.FilteredData.overallDistrictMaxCost,
+            minCost: settingsState.FilteredData.overallDistrictMinCost,
         },
         onColumnFiltersChange: setColumnFilters,
         filterFns: {
@@ -92,7 +116,7 @@ export const FloodTableByDistrict = (props) => {
                 {prepareHeader(table)}
             </thead>
             <tbody>
-                {prepareBody(table)}
+                {prepareBody(table, true)}
             </tbody>
         </table>        
     </div>;

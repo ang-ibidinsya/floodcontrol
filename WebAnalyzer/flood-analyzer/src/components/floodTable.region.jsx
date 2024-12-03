@@ -10,6 +10,7 @@ import {
   } from "@tanstack/react-table";
 import {prepareBody, prepareHeader, preparePagninator} from './floodTable';
 import {formatMoney} from '../utils/utils';
+import {StackedBarChart} from '../controls/stackedbarchart';
 
 const convertStateToTableFilter = (settingsState) => {
     let ret = [];
@@ -52,6 +53,21 @@ export const FloodTableByRegion = (props) => {
                 return <div className="divCost">{formatMoney(getValue())}</div>
             },
         },
+        {
+            accessorKey: "CostBar",
+            header: "CostBar",
+            cell: ({ getValue, row, column, table }) => {
+                let {regionGroups, minCost, maxCost} = table.getState();
+                const currRegion = row.getValue('region');
+                const findRegion = regionGroups.find(r => r.region === currRegion);
+                if (!findRegion) {
+                    console.error('[RegionTavble][CostBar] Unable to find region', currRegion);
+                    return;
+                }
+                const yearSubtotals = findRegion.yearSubTotals;                
+                return <StackedBarChart name={currRegion} subtotalsMap={yearSubtotals} minCost={minCost} maxCost={maxCost}/>;
+            },
+        },
     ];
 
     const table = useReactTable({
@@ -61,8 +77,16 @@ export const FloodTableByRegion = (props) => {
         getPaginationRowModel: getPaginationRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        initialState: {
+            pagination: {
+                pageSize: 20,
+            },
+        },
         state: {
-            columnFilters: columnFilters
+            columnFilters: columnFilters,
+            regionGroups: settingsState.FilteredData.regionGroups,
+            maxCost: settingsState.FilteredData.overallRegionMaxCost,
+            minCost: settingsState.FilteredData.overallRegionMinCost,
         },
         onColumnFiltersChange: setColumnFilters,
         filterFns: {
@@ -91,7 +115,7 @@ export const FloodTableByRegion = (props) => {
                 {prepareHeader(table)}
             </thead>
             <tbody>
-                {prepareBody(table)}
+                {prepareBody(table, true)}
             </tbody>
         </table>        
     </div>;

@@ -71,6 +71,11 @@ export const FloodTableByYear = (props) => {
         getPaginationRowModel: getPaginationRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        initialState: {
+            pagination: {
+                pageSize: 20,
+            },
+        },
         state: {
             columnFilters: columnFilters,
             maxCost: settingsState.FilteredData.overallYearMaxCost,
@@ -103,7 +108,7 @@ export const FloodTableByYear = (props) => {
                 {prepareHeader(table)}
             </thead>
             <tbody>
-                {prepareBody(table)}
+                {prepareBody(table, true)}
             </tbody>
         </table>        
     </div>;
