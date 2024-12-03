@@ -15,10 +15,26 @@ import {FloodTableByProject} from './floodTable.project';
 import {FloodTableByYear} from './floodTable.year';
 import {FloodTableByRegion} from './floodTable.region';
 import {FloodTableByDistrict} from './floodTable.district';
+import {mapColors} from '../controls/stackedbarchart';
 
 const iconSortLookup = {
     'asc': 'bx bxs-chevron-up-circle',
     'desc': 'bx bxs-chevron-down-circle',
+}
+
+export const showYearLegends = () => {
+    let legendsEl = [];
+    for (var year in mapColors) {
+        if (!Object.prototype.hasOwnProperty.call(mapColors, year)) {
+            continue;
+        }
+        legendsEl.push(<div key={`legend-${year}`} className="legendItem">
+            <div className='legendSquare' style={{backgroundColor:`${mapColors[year]}`}}/>
+            <div className='legendLabel'>{year}</div>
+        </div>);
+    }
+
+    return <div className='legendsContainer'>{legendsEl}</div>;
 }
 
 // Returns Table filter required by react-table

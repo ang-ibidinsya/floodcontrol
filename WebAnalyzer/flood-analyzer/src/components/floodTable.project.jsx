@@ -85,6 +85,12 @@ export const FloodTableByProject = (props) => {
             pagination: {
                 pageSize: 20,
             },
+            sorting: [
+                {
+                    id: 'Cost',
+                    desc: true
+                }
+            ]
         },
         state: {
             columnFilters: columnFilters,

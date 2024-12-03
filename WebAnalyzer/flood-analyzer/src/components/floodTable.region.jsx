@@ -8,7 +8,7 @@ import {
     getSortedRowModel,
     useReactTable,
   } from "@tanstack/react-table";
-import {prepareBody, prepareHeader, preparePagninator} from './floodTable';
+import {prepareBody, prepareHeader, preparePagninator, showYearLegends} from './floodTable';
 import {formatMoney} from '../utils/utils';
 import {StackedBarChart} from '../controls/stackedbarchart';
 
@@ -81,6 +81,12 @@ export const FloodTableByRegion = (props) => {
             pagination: {
                 pageSize: 20,
             },
+            sorting: [
+                {
+                    id: 'subtotal',
+                    desc: true
+                }
+            ]
         },
         state: {
             columnFilters: columnFilters,
@@ -108,6 +114,7 @@ export const FloodTableByRegion = (props) => {
 
 
     return <div className="tableContainer">
+        {showYearLegends()}
         {showGrandTotalDirectly(settingsState.FilteredData.grandTotal)}
         {preparePagninator(table)}
         <table className="floodTable">

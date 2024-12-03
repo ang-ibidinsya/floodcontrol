@@ -1,6 +1,6 @@
 import './stackedbarchart.css';
 
-const mapColors = {
+export const mapColors = {
     2017: '#E74C3C', //Red
     2018: '#3498DB', //Blue
     2019: '#2ECC71', //Green
