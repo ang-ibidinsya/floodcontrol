@@ -8,7 +8,7 @@ import {
     getSortedRowModel,
     useReactTable,
   } from "@tanstack/react-table";
-import {prepareBody, prepareHeader, preparePagninator, showYearLegends} from './floodTable';
+import {prepareBody, prepareHeader, preparePagninator, showYearLegends, createToolTip} from './floodTable';
 import {formatMoney} from '../utils/utils';
 import {StackedBarChart} from '../controls/stackedbarchart';
 
@@ -65,7 +65,12 @@ export const FloodTableByDistrict = (props) => {
                     return;
                 }
                 const yearSubtotals = findDistrict.yearSubTotals;                
-                return <StackedBarChart name={currDistrict} subtotalsMap={yearSubtotals} minCost={minCost} maxCost={maxCost}/>;
+                return <StackedBarChart 
+                    name={currDistrict} 
+                    subtotalsMap={yearSubtotals} 
+                    minCost={minCost} 
+                    maxCost={maxCost}
+                />;
             },
         },
     ];
@@ -125,6 +130,7 @@ export const FloodTableByDistrict = (props) => {
             <tbody>
                 {prepareBody(table, true)}
             </tbody>
-        </table>        
+        </table>
+        {createToolTip('my-tooltip')}
     </div>;
 }

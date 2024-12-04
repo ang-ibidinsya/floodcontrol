@@ -16,6 +16,8 @@ import {FloodTableByYear} from './floodTable.year';
 import {FloodTableByRegion} from './floodTable.region';
 import {FloodTableByDistrict} from './floodTable.district';
 import {mapColors} from '../controls/stackedbarchart';
+import 'react-tooltip/dist/react-tooltip.css';
+import { Tooltip } from 'react-tooltip';
 
 const iconSortLookup = {
     'asc': 'bx bxs-chevron-up-circle',
@@ -35,6 +37,31 @@ export const showYearLegends = () => {
     }
 
     return <div className='legendsContainer'>{legendsEl}</div>;
+}
+
+export const createToolTip = (tooltipId) => {
+    return <Tooltip
+    id={tooltipId}
+    style={{ backgroundColor: "rgb(50, 50, 50)", color: "#eee", opacity: "1" }}
+    render={({ content, activeAnchor }) => {
+        let subtotalsMap = JSON.parse(content);
+        let items = [];
+        for (var year in subtotalsMap) {
+            if (!Object.prototype.hasOwnProperty.call(subtotalsMap, year)) {
+                continue;
+            }
+            items.push(<div className="tooltipItemContainer">
+                <div className="tooltipCell tooltipYearColor" style={{backgroundColor: 'yellow'}}/>
+                <div className="tooltipCell tooltipYear">{year}:</div>
+                <div className="tooltipCell tooltipCost">{formatMoney(subtotalsMap[year])}</div>
+            </div>);
+        }
+        return <div>
+            {items}
+        </div>
+    }}
+      
+  />
 }
 
 // Returns Table filter required by react-table
