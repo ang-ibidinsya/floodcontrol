@@ -162,20 +162,26 @@
     border-radius: 3px;
 }
 
-
+/* grid-template-columns: fit-content(8ch) fit-content(8ch) fit-content(8ch); */
 .tooltipItemContainer {
     display: grid;
-    grid-template-columns: fit-content(8ch) fit-content(8ch) fit-content(8ch);    
-    column-gap: 10px;
+    grid-template-columns: minmax(1rem, 1rem) minmax(1rem, 2rem) auto;
+    column-gap: 8px;
 }
 
 .tooltipCost {
     font-family: 'Courier Prime', monospace;
     font-size: 1rem;
-    padding-top: 1px;    
+    padding-top: 1px;
+    margin-left: 5px;
+    text-align: right;
+    width: 100%;
 }
 
 .tooltipYear {
+    font-weight: 600;
+    width: 100%;
+    text-align: right;
 }
 
 .tooltipYearColor {
@@ -186,5 +192,5 @@
 }
 
 .tooltipCell {
-    margin-bottom: 10px;
+    margin-top: 2px;
 }

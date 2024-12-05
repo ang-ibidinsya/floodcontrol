@@ -42,7 +42,7 @@ export const showYearLegends = () => {
 export const createToolTip = (tooltipId) => {
     return <Tooltip
     id={tooltipId}
-    style={{ backgroundColor: "rgb(50, 50, 50)", color: "#eee", opacity: "1" }}
+    style={{ background: "black", color: "#fff", opacity: "1 !important" }}
     render={({ content, activeAnchor }) => {
         let subtotalsMap = JSON.parse(content);
         let items = [];
@@ -51,7 +51,7 @@ export const createToolTip = (tooltipId) => {
                 continue;
             }
             items.push(<div className="tooltipItemContainer">
-                <div className="tooltipCell tooltipYearColor" style={{backgroundColor: 'yellow'}}/>
+                <div className="tooltipCell tooltipYearColor" style={{backgroundColor: `${mapColors[year]}`}}/>
                 <div className="tooltipCell tooltipYear">{year}:</div>
                 <div className="tooltipCell tooltipCost">{formatMoney(subtotalsMap[year])}</div>
             </div>);
