@@ -13,6 +13,7 @@ export const mapColors = {
 }
 
 export const StackedBarChart = ({name, subtotalsMap, minCost, maxCost}) => {
+    minCost /= 4; // Adjust min so that the smallest item wont be 0
     let stacks = [];
     let tooltipYearsHtml = '';
     let sumCosts = Object.values(subtotalsMap).reduce((sum, a) => sum + a, 0);
@@ -25,12 +26,6 @@ export const StackedBarChart = ({name, subtotalsMap, minCost, maxCost}) => {
         // [a] For chart
         let percentFill = (sumCosts-minCost)/minMaxDiff * currCost/sumCosts * 100.0;
         stacks.push(<div className="bar" key={`stack-region-${name}-${year}`} style={{flexBasis: `${percentFill}%`, backgroundColor: `${mapColors[year]}`}}/>);
-
-        // [b] For tooltip
-        tooltipYearsHtml += `<div className="tooltipYear">
-            <div className=""/>
-            <div>${year}: ${currCost}</div>
-        </div>`;
     }
     
     let remaining = (maxCost-sumCosts) / minMaxDiff * 100.00;

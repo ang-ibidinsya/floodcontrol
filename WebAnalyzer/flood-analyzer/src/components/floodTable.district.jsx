@@ -13,7 +13,7 @@ import {formatMoney} from '../utils/utils';
 import {StackedBarChart} from '../controls/stackedbarchart';
 
 const convertStateToTableFilter = (settingsState) => {
-    let ret = [];
+    let ret = [{id: 'subtotal', value: null}];// Add a dummy subtotal filter, so that its custom filter can filter out 0 values
     if (settingsState.Filters.District?.length > 0) {
         ret.push({id: 'district', value: settingsState.Filters.District});
     }
@@ -49,6 +49,7 @@ export const FloodTableByDistrict = (props) => {
         {
             accessorKey: "subtotal",
             header: "Cost",
+            filterFn: 'greaterThan0',
             cell: ({ getValue, row, column, table }) => {
                 return <div className="divCost">{formatMoney(getValue())}</div>
             },
@@ -105,6 +106,9 @@ export const FloodTableByDistrict = (props) => {
             multiValueFilter: (row, columnId, filterValue) => {
                 let ret = filterValue.includes(row.getValue(columnId));
                 return ret;
+            },
+            greaterThan0:(row, columnId, filterValue) => {
+                return row.getValue(columnId) > 0
             }
         }
     })
