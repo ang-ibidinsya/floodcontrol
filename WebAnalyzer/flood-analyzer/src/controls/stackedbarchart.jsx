@@ -15,7 +15,6 @@ export const mapColors = {
 export const StackedBarChart = ({name, subtotalsMap, minCost, maxCost}) => {
     minCost /= 4; // Adjust min so that the smallest item wont be 0
     let stacks = [];
-    let tooltipYearsHtml = '';
     let sumCosts = Object.values(subtotalsMap).reduce((sum, a) => sum + a, 0);
     let minMaxDiff = maxCost - minCost;
     for (var year in subtotalsMap) {
@@ -33,7 +32,7 @@ export const StackedBarChart = ({name, subtotalsMap, minCost, maxCost}) => {
         
     return <div className="stackedBarChart"
         data-tooltip-id="my-tooltip"
-        data-tooltip-content={JSON.stringify(subtotalsMap)}
+        data-tooltip-content={JSON.stringify(subtotalsMap)}        
         >
             {stacks}
         </div>

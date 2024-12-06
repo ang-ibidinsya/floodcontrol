@@ -42,8 +42,12 @@ export const showYearLegends = () => {
 export const createToolTip = (tooltipId) => {
     return <Tooltip
     id={tooltipId}
-    style={{ background: "black", color: "#fff", opacity: "1 !important" }}
+    opacity={1}
+    clickable={true}
+    float={true}
+    style={{ background: "black", color: "#fff" }}
     render={({ content, activeAnchor }) => {
+        console.log('[ToolTip] Render');
         let subtotalsMap = JSON.parse(content);
         let items = [];
         for (var year in subtotalsMap) {

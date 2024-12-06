@@ -128,7 +128,7 @@ export const FloodTableByRegion = (props) => {
             <tbody>
                 {prepareBody(table, true)}
             </tbody>
+            {/* {createToolTip('my-tooltip')} */}
         </table>    
-        {createToolTip('my-tooltip')}    
     </div>;
 }

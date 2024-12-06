@@ -11,6 +11,7 @@ import {
 import {prepareBody, prepareHeader, preparePagninator, showYearLegends, createToolTip} from './floodTable';
 import {formatMoney} from '../utils/utils';
 import {StackedBarChart} from '../controls/stackedbarchart';
+import { Tooltip } from 'react-tooltip';
 
 const convertStateToTableFilter = (settingsState) => {
     let ret = [{id: 'subtotal', value: null}];// Add a dummy subtotal filter, so that its custom filter can filter out 0 values
@@ -122,7 +123,6 @@ export const FloodTableByDistrict = (props) => {
         settingsState.Filters.Region
     ])
 
-
     return <div className="tableContainer">
         {showYearLegends()}
         {showGrandTotalDirectly(settingsState.FilteredData.grandTotal)}
@@ -135,6 +135,6 @@ export const FloodTableByDistrict = (props) => {
                 {prepareBody(table, true)}
             </tbody>
         </table>
-        {createToolTip('my-tooltip')}
+        {/* {createToolTip('my-tooltip')} */}
     </div>;
 }
