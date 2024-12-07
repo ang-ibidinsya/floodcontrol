@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import './App.css'
 import {AppHeader} from './components/appHeader';
 import { FloodTable } from './components/floodTable';

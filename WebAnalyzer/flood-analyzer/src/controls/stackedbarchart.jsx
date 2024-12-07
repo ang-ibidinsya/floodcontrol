@@ -31,8 +31,6 @@ export const StackedBarChart = ({name, subtotalsMap, minCost, maxCost}) => {
     stacks.push(<div className="barEmpty" key={`stack-region-${name}-${remaining}`} style={{flexBasis: `${remaining}%`}}/>);
         
     return <div className="stackedBarChart"
-        data-tooltip-id="my-tooltip"
-        data-tooltip-content={JSON.stringify(subtotalsMap)}        
         >
             {stacks}
         </div>

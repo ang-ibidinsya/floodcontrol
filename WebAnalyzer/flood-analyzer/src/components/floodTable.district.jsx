@@ -10,8 +10,7 @@ import {
   } from "@tanstack/react-table";
 import {prepareBody, prepareHeader, preparePagninator, showYearLegends, createToolTip} from './floodTable';
 import {formatMoney} from '../utils/utils';
-import {StackedBarChart} from '../controls/stackedbarchart';
-import { Tooltip } from 'react-tooltip';
+import {EntityTypes} from '../enums';
 
 const convertStateToTableFilter = (settingsState) => {
     let ret = [{id: 'subtotal', value: null}];// Add a dummy subtotal filter, so that its custom filter can filter out 0 values
@@ -31,6 +30,10 @@ export const showGrandTotalDirectly = (grandTotal) => {
 export const FloodTableByDistrict = (props) => {
     
     const [columnFilters, setColumnFilters] = useState([]);
+    const [sorting, setSorting] = useState([{
+        id: 'subtotal',
+        desc: true
+    }]);
     const {settingsState} = props;
     
     console.log('[FloodTableByDistrict] render, settingsState:', settingsState);
@@ -57,23 +60,7 @@ export const FloodTableByDistrict = (props) => {
         },
         {
             accessorKey: "CostBar",
-            header: "CostBar",
-            cell: ({ getValue, row, column, table }) => {
-                let {districtGroups, minCost, maxCost} = table.getState();
-                const currDistrict = row.getValue('district');
-                const findDistrict = districtGroups.find(r => r.district === currDistrict);
-                if (!findDistrict) {
-                    console.error('[RegionTavble][CostBar] Unable to find district', currDistrict);
-                    return;
-                }
-                const yearSubtotals = findDistrict.yearSubTotals;                
-                return <StackedBarChart 
-                    name={currDistrict} 
-                    subtotalsMap={yearSubtotals} 
-                    minCost={minCost} 
-                    maxCost={maxCost}
-                />;
-            },
+            header: "CostBar"
         },
     ];
 
@@ -85,20 +72,16 @@ export const FloodTableByDistrict = (props) => {
         getPaginationRowModel: getPaginationRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        onSortingChange: setSorting,
         initialState: {
             pagination: {
                 pageSize: 20,
             },
-            sorting: [
-                {
-                    id: 'subtotal',
-                    desc: true
-                }
-            ]
         },
         state: {
+            sorting,
             columnFilters: columnFilters,
-            districtGroups: settingsState.FilteredData.districtGroups,
+            entityGroups: settingsState.FilteredData.districtGroups,
             maxCost: settingsState.FilteredData.overallDistrictMaxCost,
             minCost: settingsState.FilteredData.overallDistrictMinCost,
         },
@@ -132,7 +115,7 @@ export const FloodTableByDistrict = (props) => {
                 {prepareHeader(table)}
             </thead>
             <tbody>
-                {prepareBody(table, true)}
+                {prepareBody(table, EntityTypes.district)}
             </tbody>
         </table>
         {/* {createToolTip('my-tooltip')} */}

@@ -12,7 +12,7 @@ import {
 import {prepareBody, prepareHeader, preparePagninator, showGrandTotal, convertStateToTableFilter} from './floodTable';
 import {formatMoney} from '../utils/utils';
 import {BarChart} from '../controls/barchart';
-
+import {EntityTypes} from '../enums';
 
 const columnDefs = [
     {
@@ -120,7 +120,7 @@ export const FloodTableByProject = (props) => {
                 {prepareHeader(table)}
             </thead>
             <tbody>
-                {prepareBody(table)}
+                {prepareBody(table, EntityTypes.project)}
             </tbody>
         </table>
         

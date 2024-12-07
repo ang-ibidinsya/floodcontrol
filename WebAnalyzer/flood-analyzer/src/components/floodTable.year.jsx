@@ -11,6 +11,7 @@ import {
 import {prepareBody, prepareHeader, preparePagninator} from './floodTable';
 import {formatMoney} from '../utils/utils';
 import {BarChart} from '../controls/barchart';
+import {EntityTypes} from '../enums';
 
 const convertStateToTableFilter = (settingsState) => {
     let ret = [{id: 'subtotal', value: null}];// Add a dummy subtotal filter, so that its custom filter can filter out 0 values
@@ -112,7 +113,7 @@ export const FloodTableByYear = (props) => {
                 {prepareHeader(table)}
             </thead>
             <tbody>
-                {prepareBody(table, true)}
+                {prepareBody(table, EntityTypes.year)}
             </tbody>
         </table>        
     </div>;

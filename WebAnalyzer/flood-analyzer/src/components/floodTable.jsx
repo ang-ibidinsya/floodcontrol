@@ -18,6 +18,8 @@ import {FloodTableByDistrict} from './floodTable.district';
 import {mapColors} from '../controls/stackedbarchart';
 import 'react-tooltip/dist/react-tooltip.css';
 import { Tooltip } from 'react-tooltip';
+import {StackedBarChart} from '../controls/stackedbarchart';
+import {EntityTypes} from '../enums';
 
 const iconSortLookup = {
     'asc': 'bx bxs-chevron-up-circle',
@@ -47,8 +49,12 @@ export const createToolTip = (tooltipId) => {
     float={true}
     style={{ background: "black", color: "#fff" }}
     render={({ content, activeAnchor }) => {
-        console.log('[ToolTip] Render');
         let subtotalsMap = JSON.parse(content);
+        if (!subtotalsMap) {
+            console.log('[ToolTip] Render -- NULL', content);
+            return "NULL";
+        }
+        console.log('[ToolTip] Render', content);
         let items = [];
         for (var year in subtotalsMap) {
             if (!Object.prototype.hasOwnProperty.call(subtotalsMap, year)) {
@@ -90,29 +96,65 @@ export const convertStateToTableFilter= (settingsState) => {
     return ret;
 }
 
-export const prepareBody = (table, isSummaryType) => {
+export const prepareBody = (table, entityType) => {
+
+    
+    const prepareCostBarCell = (cell, row) => {
+        let cellClass = 'tdCostBar ';
+        if (entityType === EntityTypes.district || entityType === EntityTypes.region) {
+            // Stacked Bar Chart
+            // We put all the stackedbarChart logic here and avoid doing the rendering inside the columnDef cell render because the react-tooltip has intermittent issues when user clicks Sort
+            cellClass += ' tdCostBarFullWidth';
+            let {entityGroups, minCost, maxCost} = table.getState();
+            const currEntity = row.getValue(entityType);
+            const findEntity = entityGroups.find(grp => grp[entityType] === currEntity);
+            debugger
+            if (!findEntity) {
+                console.error('[prepareCostBarCell] Unable to find entity', currEntity);
+                return;
+            }
+            const yearSubtotals = findEntity.yearSubTotals;            
+            return <td key={cell.id} className={cellClass}>
+                <div
+                data-tooltip-id="my-tooltip"
+                data-tooltip-content={JSON.stringify(yearSubtotals)}
+                >                        
+                <StackedBarChart name={currEntity} subtotalsMap={yearSubtotals} minCost={minCost} maxCost={maxCost}/>
+                </div>                
+            </td>
+        }
+        // else: just a normal bar chart (e.g. project/year view)
+        return <td key={cell.id} className={cellClass}>
+                    <div>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </div>                
+                </td>
+    }
+
+    const prepareNormalCell = (cell) => {
+        let cellClass = 'tdTable';
+        const cellColId = cell.column.id;
+        if (cellColId === 'Cost' || cellColId === 'subtotal') {
+            cellClass = 'tdCost';
+        }
+
+        if (entityType === EntityTypes.district || entityType === EntityTypes.region || entityType === EntityTypes.year) {
+            cellClass += ' tdSummary';
+        }
+
+        return <td key={cell.id} className={cellClass}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+    }
 
     const prepareCells = (row) => {
         let retCells = row.getVisibleCells().map(cell => {
             const cellColId = cell.column.id;
-            let cellClass = 'tdTable';
-            if (cellColId === 'Cost' || cellColId === 'subtotal') {
-                cellClass = 'tdCost';
+            if (cellColId === 'CostBar') {
+                return prepareCostBarCell(cell, row)
             }
-            else if (cellColId === 'CostBar') {
-                cellClass = 'tdCostBar';
-                if (isSummaryType) {
-                    cellClass += ' tdCostBarFullWidth';
-                }
-            }
-            else if (isSummaryType) {
-                cellClass += ' tdSummary';
-            }
-            return <td key={cell.id} className={cellClass}>
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            </td>
+            return prepareNormalCell(cell);
         });
-        //retCells.push(<td key="costBar" className="tdCostBar">bar</td>)
 
         return retCells;
     }
