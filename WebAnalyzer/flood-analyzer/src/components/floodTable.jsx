@@ -108,7 +108,6 @@ export const prepareBody = (table, entityType) => {
             let {entityGroups, minCost, maxCost} = table.getState();
             const currEntity = row.getValue(entityType);
             const findEntity = entityGroups.find(grp => grp[entityType] === currEntity);
-            debugger
             if (!findEntity) {
                 console.error('[prepareCostBarCell] Unable to find entity', currEntity);
                 return;
